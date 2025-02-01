@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./Navbar.css";
-import { SearchOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import AuthForm from "../Auth/AuthForm";
 import { Link } from "react-router-dom";
+import { StoreContext } from "../../context/StoreContext";
 const NavBar = () => {
   const [menu, setMenu] = useState("home");
   const [isModalOpen, setModalOpen] = useState(false);
+
+  const {getTotalCartAmount} =useContext(StoreContext)
 
   const showModal = () => {
     setModalOpen(true); // Show modal
@@ -52,10 +54,10 @@ const NavBar = () => {
         </a>
       </ul>
       <div className="navbar-right">
-        <SearchOutlined />
+      <img src="https://testing.indiantadka.eu/assets/search_icon.png" alt="" />
         <div className="navbar-search-icon">
-          <ShoppingCartOutlined />
-          <div className="dot"></div>
+        <Link to="/cart"  onClick={() => setMenu("cart")}> <img src="https://testing.indiantadka.eu/assets/basket_icon.png"  alt="" /></Link>
+        <div className={getTotalCartAmount()===0 ? "":"dot"} />
         </div>
         <button onClick={showModal}> Sign In</button>
       </div>
