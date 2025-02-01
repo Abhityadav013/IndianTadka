@@ -6,8 +6,8 @@ const AppDownload = () => {
     <div className='app-download' id='app-download'>
       <p>For Better Experience Download<br/> Indian Tadka</p>
       <div className='app-download-platforms'>
-        <img src ='https://testing.indiantadka.eu/assets/play_store' alt="Play Store" />
-        <img src='https://testing.indiantadka.eu/assets/app_store' alt="App Store" />
+        <img src ='https://testing.indiantadka.eu/assets/play_store.png' alt="Play Store" />
+        <img src='https://testing.indiantadka.eu/assets/app_store.png' alt="App Store" />
       </div>
     </div>
   );

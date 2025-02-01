@@ -14,20 +14,20 @@ const FoodItem = ({ item }) => {
           <img
             className="add"
             onClick={() => addToCart(item.id)}
-            src='https://testing.indiantadka.eu/assets/add_icon_white'
+            src='https://testing.indiantadka.eu/assets/add_icon_white.png'
             alt=""
           />
         ) : (
           <div className="food-item-counter">
             <img
               onClick={() => removeFromCart(item.id)}
-              src='https://testing.indiantadka.eu/assets/remove_icon_red'
+              src='https://testing.indiantadka.eu/assets/remove_icon_red.png'
               alt=""
             />
             <p>{cartItems[item.id]}</p>
             <img
               onClick={() => addToCart(item.id)}
-              src='https://testing.indiantadka.eu/assets/add_icon_green'
+              src='https://testing.indiantadka.eu/assets/add_icon_green.png'
               alt=""
             />
           </div>
@@ -36,7 +36,7 @@ const FoodItem = ({ item }) => {
       <div className="food-item-info">
         <div className="food-item-name-rating">
           <p>{item.name}</p>
-          <img src='https://testing.indiantadka.eu/assets/rating_starts' alt=""></img>
+          <img src='https://testing.indiantadka.eu/assets/rating_starts.png' alt=""></img>
         </div>
         <p className="food-item-description">{item.description}</p>
         <p className="food-item-price">€ {item.price}</p>
