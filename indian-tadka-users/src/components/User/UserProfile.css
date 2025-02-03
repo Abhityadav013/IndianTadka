@@ -1,0 +1,26 @@
+/* Style for the Avatar (circle) */
+.avatar-circle {
+    background-color: tomato;  /* Tomato background color */
+    color: white;              /* White font color */
+    cursor: pointer;          /* Pointer cursor on hover */
+    display: flex;             /* Use flexbox for centering */
+    justify-content: center;   /* Center horizontally */
+    align-items: center;       /* Center vertically */
+    font-weight: bold;         /* Make initials bold */
+    font-size: 18px;           /* Adjust font size of initials */
+    width: 40px;               /* Adjust width of the circle */
+    height: 40px;              /* Adjust height of the circle */
+    border-radius: 50%;        /* Make it circular */
+  }
+  
+  /* Dropdown menu customization */
+  .ant-dropdown-menu {
+    min-width: 150px; /* Optional: You can adjust the dropdown width */
+  }
+  
+  /* Ensure avatar size remains consistent */
+  .ant-avatar {
+    display: inline-block;
+    font-size: 20px; /* Optional: You can adjust the font size of initials */
+  }
+  
