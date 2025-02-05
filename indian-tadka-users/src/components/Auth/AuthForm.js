@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Form,
   Input,
@@ -13,6 +13,8 @@ import { GoogleLogin } from "@react-oauth/google";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css"; // Import styles for the phone input
 import "./AuthForm.css";
+import { StoreContext } from "../../context/StoreContext";
+import axios from "axios";
 
 const { Title } = Typography;
 
@@ -22,16 +24,43 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+   const { login } =
+     useContext(StoreContext);
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async(values) => {
     // Handle submit for login/signup
     console.log(isLogin ? "Login credentials" : "Signup credentials", values);
+    await login(email, password);
+
     onOk(); // Optionally call this when form is submitted successfully
   };
 
-  const handleGoogleLoginSuccess = (response) => {
-    console.log("Google login response:", response);
-    // Handle Google login success
+  const handleGoogleLoginSuccess = async (response) => {
+    const { credential } = response; // This is the id_token from Google
+  
+    try {
+      // Send the Google id_token to the backend
+      const res = await axios.post(
+        "http://localhost:5000/api/v1/auth/google", // Use POST here for the Google authentication endpoint
+        { code: credential }, // Send the credential (id_token) to backend
+        { withCredentials: true } // This ensures cookies are set in the browser (if using cookies for JWT)
+      );
+  
+      // Optionally, save JWT tokens (access_token and refresh_token) in localStorage (for testing or other use cases)
+      localStorage.setItem("access_token", res.data.access_token);  // Optional, depending on how you handle tokens
+      localStorage.setItem("refresh_token", res.data.refresh_token);  // Optional
+  
+      // Save user details in localStorage or context (for persistent user data)
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+  
+      alert("Login successful!");
+  
+      // Redirect or update UI after successful login (optional)
+      // window.location.href = '/home';  // Example: Redirect to home page
+    } catch (error) {
+      console.error("Error during Google login:", error);
+      alert("Google login failed. Please try again.");
+    }
   };
 
   const handleGoogleLoginFailure = (error) => {
@@ -48,11 +77,11 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       onCancel={onCancel}
       footer={null}
       width={400}
-      bodyStyle={{ padding: "24px" }}
+      style={{ padding: "24px" }}
     >
       <Title level={3}>{isLogin ? "Login" : "Sign Up"}</Title>
       <Form
@@ -148,13 +177,15 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
 
         <Row justify="center">
           <Col span={24}>
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={handleGoogleLoginFailure}
-              type="icon"
-              shape="circle"
-              size="large"
-            />
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <GoogleLogin
+                onSuccess={handleGoogleLoginSuccess}
+                onError={handleGoogleLoginFailure}
+                type="icon"
+                shape="circle"
+                size="large"
+              />
+            </div>
           </Col>
         </Row>
 
