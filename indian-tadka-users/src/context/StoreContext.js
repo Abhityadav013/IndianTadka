@@ -1,14 +1,40 @@
 import { createContext, useEffect, useState } from "react";
 import { food_list } from "../utils/menu_list";
-import { base_url } from "../utils/apiUrl";
+import { base_url, menu_url } from "../utils/apiUrl";
 import axios from "axios";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
+  const [food_list, setFoodList] = useState([]);
   const [cartItems, setCartItems] = useState({});
   const [userDetails, setUserDetails] = useState({});
   const [isLoading, setIsLoding] = useState(true);
+
+  const ACCESS_TOKEN_new = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzYWUyMmRhZmMyZTBjOTZmOTAyNzMiLCJpYXQiOjE3Mzg3NDg3OTAsImV4cCI6MTczODc2MzE5MH0.dYk6hRtOjUqnuCTk6APGM1YVeDb2CDhMzZTm8RP-a50";
+
+  useEffect(() => {
+    const fetchFoodItems = async () => {
+      try {
+        const accessToken = localStorage.getItem("access_token");
+        if (!accessToken) {
+          setIsLoding(false);
+          return;
+        }
+  
+        const response = await axios.get(`${menu_url}/menu`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Add token to the Authorization header
+          },}); // Replace with your API URL
+          const filteredItems = response.data.filter((item) => item.isDelivery === true);
+        setFoodList(filteredItems);
+      } catch (error) {
+        console.error("Error fetching food items:", error);
+      }
+    };
+
+    fetchFoodItems();
+  }, []);
 
   const addToCart = (itemId) => {
     if (!cartItems[itemId]) {

@@ -29,8 +29,9 @@
 }
 
 .explore-menu-list-item img {
-  width: 7.5vw;
-  min-width: 80px;
+  width: 120px; /* Ensure equal size */
+  height: 120px; /* Ensure equal size */
+  object-fit: cover; /* Ensures the image fits perfectly */
   cursor: pointer;
   border-radius: 50%;
   transition: 0.2s;
@@ -39,8 +40,9 @@
 .explore-menu-list-item p {
   margin-top: 10px;
   color: #747474;
-  font-size: max(1.4vw, 16px);
+  font-size: 16px;
   cursor: pointer;
+  text-align: center;
 }
 
 .explore-menu hr {
@@ -54,6 +56,7 @@
   border: 4px solid tomato;
   padding: 2px;
 }
+
 
 @media (max-width: 1050px) {
   .explore-menu-text {

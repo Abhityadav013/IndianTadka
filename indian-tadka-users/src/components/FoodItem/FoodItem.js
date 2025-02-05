@@ -9,7 +9,8 @@ const FoodItem = ({ item }) => {
   return (
     <div className="food-item">
       <div className="food-item-img-container">
-        <img className="food-item-image" src={item.image} alt="" />
+        <img className="food-item-image" src={item.imageURL} alt="" />
+        
         {!cartItems[item.id] ? (
           <img
             className="add"
@@ -34,12 +35,22 @@ const FoodItem = ({ item }) => {
         )}
       </div>
       <div className="food-item-info">
-        <div className="food-item-name-rating">
-          <p>{item.name}</p>
-          <img src='https://testing.indiantadka.eu/assets/rating_starts.png' alt=""></img>
+        <div className="food-item-name">
+          <img className="food-item-rating" src='https://testing.indiantadka.eu/assets/rating_starts.png' alt=""></img>
+          <p>{item.delivery.itemName}</p>
         </div>
+        
         <p className="food-item-description">{item.description}</p>
-        <p className="food-item-price">€ {item.price}</p>
+        <p className="food-item-price">€ {item.delivery.price}</p>
+        {item.tags && item.tags.length > 0 && (
+                <div className="tags-container">
+                {item.tags.map((tag, tagIndex) => (
+                <span key={tagIndex} className="tag">
+                  {tag}
+                </span>
+                ))}
+                </div>
+              )}
       </div>
     </div>
   );
