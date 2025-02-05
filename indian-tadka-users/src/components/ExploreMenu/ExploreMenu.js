@@ -5,14 +5,11 @@ import axios from "axios";
 const ExploreMenu = ({ category, setCategory }) => {
   const [menu_list, setMenuList] = useState([]);
 
-  const ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NzkzYWUyMmRhZmMyZTBjOTZmOTAyNzMiLCJpYXQiOjE3Mzg2OTQ3MjksImV4cCI6MTczODcwOTEyOX0.6JKJI98Q8pAQ-xsEWdDcA5pJwNZ6wfs6lNscJu9-Vvk";
+ 
   useEffect(() => {
     const fetchFoodItems = async () => {
       try {
-        const response = await axios.get(process.env.REACT_APP_API_BASE_URL_MENU+'/category', {
-          headers: {
-            Authorization: `Bearer ${ACCESS_TOKEN}`, // Add token to the Authorization header
-          },}); // Replace with your API URL
+        const response = await axios.get(process.env.REACT_APP_API_BASE_URL_MENU+'/category'); // Replace with your API URL
           const filteredItems = response.data.filter((cat) => cat.isDelivery === true);
           const transformedMenuList = filteredItems.map((cat) => ({
             menu_name: cat.categoryName,
