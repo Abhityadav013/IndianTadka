@@ -2,14 +2,13 @@ import { createContext, useEffect, useState } from "react";
 import { food_list } from "../utils/menu_list";
 import { base_url } from "../utils/apiUrl";
 import axios from "axios";
-import api from "../utils/axiosInstance";
 
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [userDetails, setUserDetails] = useState({});
-  const [isLoading,setIsLoding] = useState(true);
+  const [isLoading, setIsLoding] = useState(true);
 
   const addToCart = (itemId) => {
     if (!cartItems[itemId]) {
@@ -39,19 +38,34 @@ const StoreContextProvider = (props) => {
   };
 
   useEffect(() => {
-    fetchUser();
+    const accessToken = localStorage.getItem("access_token");
+    if (accessToken) {
+      fetchUser();
+    } else {
+      setIsLoding(false); // If no token, set loading to false and skip fetch
+    }
   }, []);
 
   const fetchUser = async () => {
     try {
-      const response = await api.get(`${base_url}/profile`, {
-        withCredentials: true,
+      const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) {
+        setIsLoding(false);
+        return;
+      }
+
+      const response = await axios.get(`${base_url}/profile`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`, // Send token as Bearer
+        },
       });
       setUserDetails(response.data.data.userDetails);
     } catch (err) {
       console.error("Error fetching user:", err);
-    }finally{
-      setIsLoding(false)
+      // Handle error (for example, token may have expired)
+      setUserDetails(null);  // Optional: Set to null if there's an error
+    } finally {
+      setIsLoding(false);
     }
   };
 
@@ -63,7 +77,9 @@ const StoreContextProvider = (props) => {
         { withCredentials: true }
       );
       if (response.data.statusCode === 200) {
-        fetchUser();
+        localStorage.setItem("access_token", response.data.data.access_token);
+        localStorage.setItem("refresh_token", response.data.data.refresh_token);
+        fetchUser(); // Fetch user after successful login
       }
     } catch (err) {
       console.error("Login failed:", err);
@@ -72,19 +88,19 @@ const StoreContextProvider = (props) => {
 
   const logoutUser = async () => {
     try {
-      const response = await api.post(`${base_url}/logout`, {
+      const response = await axios.post(`${base_url}/logout`, {
         withCredentials: true,
       });
-      if (response.status === 200) {
+      if (response.data.statusCode === 200) {
         console.log("Successfully logged out");
-        setUserDetails(null);  // Clear user state on the frontend
-        //window.location.href = '/';
+        setUserDetails(null); // Clear user state on frontend
+        localStorage.removeItem("access_token"); // Remove access token
+        localStorage.removeItem("refresh_token"); // Remove refresh token
       }
     } catch (err) {
       console.error("Error logging out:", err);
     }
   };
-
   const contextValue = {
     food_list,
     cartItems,
@@ -95,7 +111,7 @@ const StoreContextProvider = (props) => {
     login,
     userDetails,
     logoutUser,
-    isLoading
+    isLoading,
   };
 
   return (
