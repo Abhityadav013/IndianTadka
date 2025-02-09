@@ -1,27 +1,38 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Dropdown, Menu, Avatar } from "antd";
 import {
   UserOutlined,
   LogoutOutlined,
   ShoppingCartOutlined,
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import "./UserProfile.css"; // Import the CSS file
+import "./UserProfile.css";
+import { StoreContext } from "../../context/StoreContext";
 
 const UserProfileMenu = ({ userData, logoutUser }) => {
+  const { sendOTP, isAccountVerified } = useContext(StoreContext);
   if (!userData) {
     return null; // Return nothing if user is not logged in
   }
 
-  // Extract first and last initials from user's name (e.g., "Abhit Yadav" => "AY")
   const userName = userData.name.split(" ");
   const initials = `${userName[0][0]}${userName[1][0]}`.toUpperCase();
 
-  // Menu items
   const menu = (
     <Menu>
       <Menu.Item key="profile" icon={<UserOutlined />}>
         Profile
       </Menu.Item>
+      {!isAccountVerified && (
+        <Menu.Item
+          key="account-verify"
+          icon={<SafetyCertificateOutlined />}
+          onClick={() => sendOTP()}
+        >
+          Verify Account
+        </Menu.Item>
+      )}
+
       <Menu.Item key="orders" icon={<ShoppingCartOutlined />}>
         Your Orders
       </Menu.Item>
@@ -30,9 +41,6 @@ const UserProfileMenu = ({ userData, logoutUser }) => {
         icon={<LogoutOutlined />}
         onClick={() => {
           logoutUser();
-          // Handle logout (e.g., clear localStorage and redirect)
-          //   localStorage.removeItem("userDetails");
-          //   window.location.href = "/login"; // Redirect to login
         }}
       >
         Logout

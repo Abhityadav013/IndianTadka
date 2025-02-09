@@ -15,3 +15,9 @@
     gap:30px;
     row-gap: 50px;
 }
+
+@media (max-width: 600px) { 
+    .food-display-list {
+        grid-template-columns: repeat(2, 1fr); /* Show 2 items per row */
+    }
+}

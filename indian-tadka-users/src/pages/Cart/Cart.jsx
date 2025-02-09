@@ -1,15 +1,22 @@
 import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
+import EmailVerificationAlert from "../../components/EmailVerification/EmailVerification";
 
 const Cart = () => {
-  const { cartItems, food_list, removeFromCart,getTotalCartAmount } = useContext(StoreContext);
-  console.log('getTotalCartAmount<<<<<',getTotalCartAmount())
-const [deliveryFee] = useState(2);
-const navigate = useNavigate()
+  const {
+    cartItems,
+    food_list,
+    removeFromCart,
+    getTotalCartAmount,
+    userDetails,
+  } = useContext(StoreContext);
+  const [deliveryFee] = useState(2);
+  const navigate = useNavigate();
   return (
     <div className="cart">
+      {userDetails && <EmailVerificationAlert user={userDetails} />}
       <div className="cart-items">
         <div className="cart-items-title">
           <p>Items</p>
@@ -49,13 +56,11 @@ const navigate = useNavigate()
             <div className="cart-total-details">
               <p>SubTotal</p>
               <p>{getTotalCartAmount()}</p>
-              
             </div>
             <hr />
             <div className="cart-total-details">
               <p>Delivery Fee</p>
               <p>{deliveryFee}</p>
-              
             </div>
             <hr />
             <div className="cart-total-details">
@@ -63,7 +68,9 @@ const navigate = useNavigate()
               <b>{getTotalCartAmount(deliveryFee)}</b>
             </div>
           </div>
-          <button onClick={() => navigate('/order')}>PROCEED TO CHECKOUT</button>
+          <button onClick={() => navigate("/order")}>
+            PROCEED TO CHECKOUT
+          </button>
         </div>
         <div className="cart-promocode">
           <div>

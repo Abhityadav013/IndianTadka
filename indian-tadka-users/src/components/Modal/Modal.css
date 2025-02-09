@@ -1,0 +1,137 @@
+/* Modal.css */
+
+/* Overlay to cover the screen */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5) !important; /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999 !important; /* Ensure it is above other content */
+}
+
+/* Modal content */
+.modal-content {
+    background-color: white !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important; /* Softer shadow for a sleek look */
+    position: relative !important;
+    max-height: 90vh !important;  /* Ensures modal doesn't overflow off-screen */
+    overflow-y: auto !important;  /* Allows scrolling if content overflows */
+    width: 90% !important; /* Default size for mobile */
+    max-width: 600px !important; /* Maximum width for larger screens */
+    transition: all 0.3s ease-in-out !important;  /* Smooth animation on modal pop-in */
+}
+
+/* Modal Sizes */
+.modal-content.xs {
+    width: 40% !important; /* Extra-small Modal: 40% width */
+    max-width: 300px !important;
+}
+
+.modal-content.small {
+    width: 50% !important; /* Small Modal: 50% width */
+    max-width: 420px !important;
+}
+
+.modal-content.medium {
+    width: 75% !important; /* Medium Modal: 75% width */
+    max-width: 600px !important;
+}
+
+.modal-content.large {
+    width: 90% !important; /* Large Modal: 90% width */
+    max-width: 900px !important;
+}
+
+.modal-content.extra-large {
+    width: 95% !important; /* Extra-large Modal: 95% width */
+    max-width: 1200px !important;
+}
+
+/* Close button */
+.modal-close {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    background: none !important;
+    border: none !important;
+    font-size: 24px !important;
+    font-weight: bold !important;
+    color: #333 !important;
+    cursor: pointer !important;
+    padding: 5px !important;
+    transition: none !important; /* No transition for hover effect */
+}
+
+/* Modal Body (Children) */
+.modal-body {
+    overflow: hidden !important;  /* Ensures no unwanted scrollbars for the body */
+}
+
+/* Responsive Styling */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 90% !important; /* 90% width for small to medium screens */
+    }
+
+    .modal-close {
+        font-size: 20px !important; /* Slightly smaller close button for smaller screens */
+    }
+
+    .modal-content.xs {
+        width: 70% !important; /* For extra-small modal on smaller devices */
+    }
+
+    .modal-content.small {
+        width: 80% !important; /* For small modal */
+    }
+
+    .modal-content.medium {
+        width: 85% !important;
+    }
+
+    .modal-content.large {
+        width: 90% !important;
+    }
+
+    .modal-content.extra-large {
+        width: 95% !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .modal-content {
+        width: 100% !important; /* Full width on extra small screens */
+        padding: 15px !important;
+    }
+
+    .modal-close {
+        font-size: 18px !important;
+    }
+
+    .modal-content.xs {
+        width: 100% !important; /* Full width for extra-small modal on very small screens */
+    }
+
+    .modal-content.small {
+        width: 85% !important;
+    }
+
+    .modal-content.medium {
+        width: 100% !important;
+    }
+
+    .modal-content.large {
+        width: 100% !important;
+    }
+
+    .modal-content.extra-large {
+        width: 100% !important;
+    }
+}

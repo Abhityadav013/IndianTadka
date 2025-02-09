@@ -1,0 +1,274 @@
+/* Card styling */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Heading styling */
+h4 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3e2a47;
+  margin-bottom: 20px;
+}
+
+/* Input field styling */
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 2px solid #dcdfe6;
+  border-radius: 8px;
+  font-size: 16px;
+  color: #3e2a47;
+  transition: border-color 0.3s;
+}
+
+/* Input field focus styling */
+input:focus {
+  border-color: #5c6bf2;
+  outline: none;
+}
+
+/* Countdown and Resend OTP section */
+.countdown-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.countdown-text p {
+  font-size: 14px;
+  color: #6f4a8e;
+}
+
+.countdown-text span {
+  font-weight: 600;
+  font-size: 16px;
+  color: #2d1d35;
+}
+
+.countdown-text button {
+  font-size: 14px;
+  background-color: transparent;
+  border: none;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.countdown-text button:hover {
+  color: #5c6bf2;
+}
+
+.otp-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.otp-input {
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  margin: 0 5px;
+}
+
+.otp-input:focus {
+  border-color: #506cff;
+  outline: none;
+}
+
+/* Disabled and active button styling */
+.disabled-btn {
+  color: #b0b0b0 !important;
+  background: none !important;
+  cursor: not-allowed;
+}
+
+.active-btn {
+  color: #f44336;
+  background: none !important;
+}
+
+/* Submit button styling */
+.submit-btn {
+  width: 50%;
+  padding: 12px;
+  font-size: 16px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  margin-left: 65px;
+  background: linear-gradient(90deg, #ac4eeb 0%, #7f39f9 100%) !important;
+  color: #fff;
+  border: none;
+  border-radius: 8px !important;
+  font-weight: 500;
+  transition: background 0.3s, transform 0.3s;
+}
+
+.submit-btn:hover {
+  background: #6935e8;
+  transform: translateY(-3px);
+}
+
+/* Responsive Styles */
+
+/* Large Screen */
+@media screen and (min-width: 1200px) {
+  .card {
+    padding: 20px;
+    max-width: 500px; /* Larger card for large screens */
+  }
+
+  h4 {
+    font-size: 22px;
+  }
+
+  input {
+    font-size: 18px;
+    padding: 14px;
+  }
+
+  .submit-btn {
+    font-size: 18px;
+    padding: 14px;
+    width: 60%;
+  }
+
+  .countdown-text p {
+    font-size: 16px;
+  }
+}
+
+/* Medium Screen */
+@media screen and (max-width: 1199px) and (min-width: 768px) {
+  .card {
+    padding: 25px;
+    max-width: 450px; /* Medium-sized card for mid-sized screens */
+  }
+
+  h4 {
+    font-size: 20px;
+  }
+
+  input {
+    font-size: 17px;
+    padding: 12px;
+  }
+
+  .submit-btn {
+    font-size: 16px;
+    padding: 12px;
+    width: 55%;
+  }
+
+  .countdown-text p {
+    font-size: 15px;
+  }
+}
+
+/* Mobile (Tablet and below) */
+@media screen and (max-width: 768px) {
+  /* Card styling for small screens */
+  .card {
+    padding: 20px;
+    width: 100%;
+  }
+
+  h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+
+  input {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .submit-btn {
+    width: 100%; /* Full width button */
+    margin-left: 0;
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  /* Countdown text adjustments */
+  .countdown-text p {
+    font-size: 13px;
+  }
+
+  .countdown-text span {
+    font-size: 15px;
+  }
+
+  /* OTP Input field for small screens */
+  .otp-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 equal columns for OTP inputs */
+    gap: 10px;
+  }
+
+  .otp-input {
+    width: 100%;
+    height: 50px;
+    font-size: 18px;
+  }
+}
+
+/* Small Mobile (Portrait and smaller) */
+@media screen and (max-width: 480px) {
+  .card {
+    padding: 15px;
+    width: 100%;
+  }
+
+  h4 {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  input {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .submit-btn {
+    font-size: 14px;
+    width: 100%; /* Full width button */
+    padding: 10px;
+  }
+
+  .countdown-text p {
+    font-size: 12px;
+  }
+
+  .countdown-text span {
+    font-size: 14px;
+  }
+
+  .otp-inputs {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+
+  .otp-input {
+    width: 100%;
+    height: 45px;
+    font-size: 16px;
+  }
+}

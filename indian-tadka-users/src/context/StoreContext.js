@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState } from "react";
-import { food_list } from "../utils/menu_list";
 import { base_url, menu_url } from "../utils/apiUrl";
 import axios from "axios";
+import api from "../utils/axiosInstance";
 
 export const StoreContext = createContext(null);
 
@@ -10,6 +10,10 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const [userDetails, setUserDetails] = useState({});
   const [isLoading, setIsLoding] = useState(true);
+  const [isAccountVerified, setAccountVerified] = useState(false);
+  const [otpExpiresAt, setOTPExpiredAt] = useState(0);
+  const [isOtpSent, setOtpSent] = useState(false);
+  const [isOtpModalOpen, setIsOtpModelOpen] = useState(false);
 
 
   useEffect(() => {
@@ -53,48 +57,50 @@ const StoreContextProvider = (props) => {
     return totalAmount > 0 ? totalAmount + deliveryFee : 0;
   };
 
-  useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
-    if (accessToken) {
-      fetchUser();
-    } else {
-      setIsLoding(false); // If no token, set loading to false and skip fetch
-    }
-  }, []);
+  const handleOtpModal = () => {
+    setIsOtpModelOpen((prevState) => !prevState); // Toggles the state
+  };
 
   const fetchUser = async () => {
     try {
-      const accessToken = localStorage.getItem("access_token");
-      if (!accessToken) {
-        setIsLoding(false);
-        return;
-      }
-
-      const response = await axios.get(`${base_url}/profile`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`, // Send token as Bearer
-        },
-      });
+      const response = await api.get(`${base_url}/profile`, { withCredentials: true });
       setUserDetails(response.data.data.userDetails);
     } catch (err) {
       console.error("Error fetching user:", err);
-      // Handle error (for example, token may have expired)
-      setUserDetails(null);  // Optional: Set to null if there's an error
+      setUserDetails(null);
     } finally {
       setIsLoding(false);
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   const login = async (email, password) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         `${base_url}/login`,
         { email, password },
         { withCredentials: true }
       );
       if (response.data.statusCode === 200) {
-        localStorage.setItem("access_token", response.data.data.access_token);
-        localStorage.setItem("refresh_token", response.data.data.refresh_token);
+        fetchUser(); // Fetch user after successful login
+      }
+    } catch (err) {
+      console.error("Login failed:", err);
+    }
+  };
+
+  const register = async (userData) => {
+    try {
+      const response = await api.post(
+        `${base_url}/register`,
+        { ...userData },
+        { withCredentials: true }
+      );
+      console.log("register_token", document.cookie);
+      if (response.data.statusCode === 200) {
         fetchUser(); // Fetch user after successful login
       }
     } catch (err) {
@@ -104,7 +110,7 @@ const StoreContextProvider = (props) => {
 
   const logoutUser = async () => {
     try {
-      const response = await axios.post(`${base_url}/logout`, {
+      const response = await api.post(`${base_url}/logout`, {
         withCredentials: true,
       });
       if (response.data.statusCode === 200) {
@@ -117,6 +123,31 @@ const StoreContextProvider = (props) => {
       console.error("Error logging out:", err);
     }
   };
+
+  const sendOTP = async () => {
+    const response = await api.post(`${base_url}/send-verify-otp`);
+    if (response.data.statusCode === 200) {
+      handleOtpModal();
+      setOTPExpiredAt(response.data.data.otpExpiresAt);
+      setOtpSent(true);
+    }
+  };
+
+  const resendOTP = async () => {
+    const response = await api.post(`${base_url}/send-verify-otp`);
+    if (response.data.statusCode === 200) {
+      setOTPExpiredAt(response.data.data.otpExpiresAt);
+      setOtpSent(true);
+    }
+  };
+
+  const verifyOTP = async (otp) => {
+    const response = await api.post(`${base_url}/verify-account`, { otp: otp });
+    if (response.data.statusCode === 200) {
+      handleOtpModal();
+      setAccountVerified(response.data.data.isAccountVerified);
+    }
+  };
   const contextValue = {
     food_list,
     cartItems,
@@ -125,9 +156,18 @@ const StoreContextProvider = (props) => {
     removeFromCart,
     getTotalCartAmount,
     login,
+    register,
     userDetails,
     logoutUser,
     isLoading,
+    sendOTP,
+    isOtpSent,
+    isAccountVerified,
+    otpExpiresAt,
+    verifyOTP,
+    handleOtpModal,
+    isOtpModalOpen,
+    resendOTP,
   };
 
   return (
