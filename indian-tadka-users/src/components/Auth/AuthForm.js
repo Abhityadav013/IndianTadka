@@ -15,29 +15,31 @@ import "react-phone-number-input/style.css"; // Import styles for the phone inpu
 import "./AuthForm.css";
 import { StoreContext } from "../../context/StoreContext";
 import axios from "axios";
+import { isValidPhoneNumber } from "libphonenumber-js";
 
 const { Title } = Typography;
 
 const AuthForm = ({ visible, onCancel, onOk }) => {
   const [isLogin, setIsLogin] = useState(true); // Toggle between login/signup
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-   const { login } =
-     useContext(StoreContext);
+  const { login, register } = useContext(StoreContext);
 
-  const handleSubmit = async(values) => {
-    // Handle submit for login/signup
-    console.log(isLogin ? "Login credentials" : "Signup credentials", values);
-    await login(email, password);
-
+  const handleSubmit = async (values) => {
+    if (isLogin) {
+      await login(email, password);
+    } else {
+      await register(values);
+    }
     onOk(); // Optionally call this when form is submitted successfully
   };
 
   const handleGoogleLoginSuccess = async (response) => {
     const { credential } = response; // This is the id_token from Google
-  
+
     try {
       // Send the Google id_token to the backend
       const res = await axios.post(
@@ -45,16 +47,16 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
         { code: credential }, // Send the credential (id_token) to backend
         { withCredentials: true } // This ensures cookies are set in the browser (if using cookies for JWT)
       );
-  
+
       // Optionally, save JWT tokens (access_token and refresh_token) in localStorage (for testing or other use cases)
-      localStorage.setItem("access_token", res.data.access_token);  // Optional, depending on how you handle tokens
-      localStorage.setItem("refresh_token", res.data.refresh_token);  // Optional
-  
+      localStorage.setItem("access_token", res.data.access_token); // Optional, depending on how you handle tokens
+      localStorage.setItem("refresh_token", res.data.refresh_token); // Optional
+
       // Save user details in localStorage or context (for persistent user data)
       localStorage.setItem("user", JSON.stringify(res.data.user));
-  
+
       alert("Login successful!");
-  
+
       // Redirect or update UI after successful login (optional)
       // window.location.href = '/home';  // Example: Redirect to home page
     } catch (error) {
@@ -87,9 +89,30 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
       <Form
         name={isLogin ? "login" : "signup"}
         onFinish={handleSubmit}
-        initialValues={{ email, password, phoneNumber, confirmPassword }}
+        initialValues={{ name, email, password, phoneNumber, confirmPassword }}
         layout="vertical"
       >
+         {!isLogin &&(
+          <Form.Item
+          name="name"
+          label="Name"
+          rules={[
+            {
+              required: true,
+              type: "name",
+              message: "Please enter your full name!",
+            },
+          ]}
+        >
+          <Input
+            type="name"
+            placeholder="Please enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </Form.Item>
+         )}
+
         <Form.Item
           name="email"
           label="Email"
@@ -115,10 +138,21 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
             label="Phone Number"
             rules={[
               { required: true, message: "Please enter your phone number!" },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value) {
+                    return Promise.reject("Phone number is required.");
+                  }
+                  if (!isValidPhoneNumber(value)) {
+                    return Promise.reject("Invalid phone number.");
+                  }
+                  return Promise.resolve();
+                },
+              }),
             ]}
           >
             <PhoneInput
-              defaultCountry="US"
+              defaultCountry="DE"
               value={phoneNumber}
               onChange={setPhoneNumber}
               international
@@ -131,7 +165,14 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
         <Form.Item
           name="password"
           label="Password"
-          rules={[{ required: true, message: "Please enter your password!" }]}
+          rules={[
+            { required: true, message: "Please enter your password!" },
+            {
+              pattern: /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{6,}$/,
+              message:
+                "Password must be at least 6 characters long and include an uppercase letter, a number, and a special character.",
+            },
+          ]}
         >
           <Input.Password
             placeholder="Password"

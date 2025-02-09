@@ -4,12 +4,20 @@ import AuthForm from "../Auth/AuthForm";
 import { Link } from "react-router-dom";
 import { StoreContext } from "../../context/StoreContext";
 import UserProfileMenu from "../User/UserProfile";
+import OTPComponent from "../OtpComponent/OTPComponent";
+import Modal from "../Modal/Modal";
 
 const NavBar = () => {
+  const {
+    getTotalCartAmount,
+    userDetails,
+    logoutUser,
+    isLoading,
+    isOtpModalOpen,
+    handleOtpModal
+  } = useContext(StoreContext);
   const [menu, setMenu] = useState("home");
   const [isModalOpen, setModalOpen] = useState(false);
-
-  const { getTotalCartAmount, userDetails,logoutUser,isLoading } = useContext(StoreContext);
 
   const showModal = () => {
     setModalOpen(true); // Show modal
@@ -78,15 +86,19 @@ const NavBar = () => {
           </Link>
           <div className={getTotalCartAmount() === 0 ? "" : "dot"} />
         </div>
-        {!isLoading && (  // Only render after loading is complete
-          userDetails && userDetails.name ? (
+        {!isLoading && // Only render after loading is complete
+          (userDetails && userDetails.name ? (
             <UserProfileMenu userData={userDetails} logoutUser={logoutUser} />
           ) : (
             <button onClick={showModal}>Sign In</button> // ✅ Show "Sign In" if no user
-          )
-        )}
+          ))}
       </div>
       <AuthForm visible={isModalOpen} onCancel={handleCancel} onOk={handleOk} />
+      { isOtpModalOpen  && (
+        <Modal size="small" onClose={handleOtpModal}>
+          <OTPComponent />
+        </Modal>
+      )}
     </div>
   );
 };

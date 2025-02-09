@@ -1,17 +1,29 @@
+// Modal.js
 import React from 'react';
-import { Modal } from 'antd';
+import './Modal.css'; // Importing the modal's CSS
 
-const ModalComponent = ({ visible, onCancel, onOk, children, title }) => {
+const Modal = ({ children, onClose, size = 'medium' }) => {
+  const handleOverlayClick = (e) => {
+    // Close modal if clicked outside
+    onClose();
+  };
+
+  const handleModalClick = (e) => {
+    // Stop propagation to prevent closing the modal when clicked inside
+    e.stopPropagation();
+  };
+
   return (
-    <Modal
-      title={title}
-      visible={visible}
-      onCancel={onCancel}
-      onOk={onOk}
-    >
-      {children}  {/* Render the passed children */}
-    </Modal>
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div
+        className={`modal-content ${size}`}
+        onClick={handleModalClick}
+      >
+        <button className="modal-close" onClick={onClose}>×</button> {/* Close button styled better */}
+        <div className="modal-body">{children}</div> {/* Wrap content in body to manage overflow */}
+      </div>
+    </div>
   );
 };
 
-export default ModalComponent;
+export default Modal;
