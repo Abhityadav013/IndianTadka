@@ -10,10 +10,6 @@
 
 # production
 /build
-/.env
-/.env.development
-/.env.production
-
 
 # misc
 .DS_Store
@@ -21,6 +17,9 @@
 .env.development.local
 .env.test.local
 .env.production.local
+
+.env.development
+.env.production
 
 npm-debug.log*
 yarn-debug.log*
