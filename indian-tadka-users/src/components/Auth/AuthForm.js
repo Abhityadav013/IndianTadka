@@ -34,7 +34,6 @@ const AuthForm = ({ visible, onCancel, onOk }) => {
     } else {
       await register(values);
     }
-    onOk(); // Optionally call this when form is submitted successfully
   };
 
   const handleGoogleLoginSuccess = async (response) => {

@@ -1,7 +1,8 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { base_url, menu_url } from "../utils/apiUrl";
 import axios from "axios";
 import api from "../utils/axiosInstance";
+import { useNavigate } from "react-router-dom";
 
 export const StoreContext = createContext(null);
 
@@ -14,20 +15,47 @@ const StoreContextProvider = (props) => {
   const [otpExpiresAt, setOTPExpiredAt] = useState(0);
   const [isOtpSent, setOtpSent] = useState(false);
   const [isOtpModalOpen, setIsOtpModelOpen] = useState(false);
-
+  const [userLocation, setUserLocation] = useState(null);
+  const [menu_list, setMenuList] = useState([]);
+  const prevCartRef = useRef(true);
+  const [cartItemCount, setCartItemCount] = useState(0);
+  const [isuserLocationFetched, setIsLocationFetched] = useState(false);
+  const [isLoginModalOpen, setLoginModalOpen] = useState(false);
+  const [redirectPage, setRedirectPage] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFoodItems = async () => {
       try {
         const response = await axios.get(`${menu_url}/menu`); // Replace with your API URL
-          const filteredItems = response.data.filter((item) => item.isDelivery === true);
+        const filteredItems = response.data.filter(
+          (item) => item.isDelivery === true
+        );
         setFoodList(filteredItems);
       } catch (error) {
         console.error("Error fetching food items:", error);
       }
     };
 
+    const fetchMenuItems = async () => {
+      try {
+        const response = await axios.get(`${menu_url}/category`); // Replace with your API URL
+
+        const filteredItems = response.data
+          .filter((cat) => cat.isDelivery === true)
+          .map((cat) => ({
+            menu_name: cat.categoryName,
+            menu_image: cat.imageUrl, // Ensure your API provides this field
+          }));
+
+        setMenuList(filteredItems);
+      } catch (error) {
+        console.error("Error fetching food items:", error);
+      }
+    };
+
     fetchFoodItems();
+    fetchMenuItems();
   }, []);
 
   const addToCart = (itemId) => {
@@ -61,21 +89,150 @@ const StoreContextProvider = (props) => {
     setIsOtpModelOpen((prevState) => !prevState); // Toggles the state
   };
 
-  const fetchUser = async () => {
+  const handleLoginModal = () => {
+    setLoginModalOpen((prevState) => !prevState); // Toggles the state
+  };
+  const handleRedirectPage = (redirectURL) => {
+    setRedirectPage(redirectURL);
+  };
+
+  const handleCart = useCallback(async () => {
     try {
-      const response = await api.get(`${base_url}/profile`, { withCredentials: true });
+      const cartItemIds = Object.keys(cartItems);
+      const shouldFetchCart = cartItemIds.length === 0; // If empty, just fetch
+
+      // 🔹 Skip API call if cart hasn't changed
+      if (JSON.stringify(cartItems) === JSON.stringify(prevCartRef.current)) {
+        return;
+      }
+
+      // Prepare cart payload if updating
+      const cart = shouldFetchCart
+        ? undefined
+        : food_list
+            .filter((food) => cartItemIds.includes(food.id))
+            .map((food) => ({
+              itemId: food.id,
+              itemName: food.itemName,
+              quantity: cartItems[food.id],
+            }));
+
+      const response = await axios.post(
+        `${base_url}/cart`,
+        cart ? { cart } : {}, // Send cart data only if updating
+        { withCredentials: true }
+      );
+
+      if (
+        response.data.statusCode === 200 ||
+        response.data.statusCode === 201
+      ) {
+        const isGuest = sessionStorage.getItem("tid") || false;
+
+        if (isGuest) {
+          const formattedCart = response.data.data.cart.cartItems.reduce(
+            (acc, item) => {
+              acc[item.itemId] = item.quantity;
+              return acc;
+            },
+            {}
+          );
+          setCartItemCount(Object.keys(formattedCart).length);
+
+          // 🔹 Only update state if it’s different
+          if (JSON.stringify(cartItems) !== JSON.stringify(formattedCart)) {
+            setCartItems(formattedCart);
+          }
+
+          // 🔹 Save last cart state
+          prevCartRef.current = formattedCart;
+        }
+      }
+    } catch (err) {
+      console.error("Cart update failed:", err);
+    }
+  }, [cartItems, food_list]); // ✅ Keep cartItems dependency
+
+  // 🔹 Run API only when cartItems change
+  useEffect(() => {
+    handleCart();
+  }, [cartItems, handleCart]);
+
+  const fetchUser = useCallback(async () => {
+    try {
+      const response = await api.get(`${base_url}/profile`, {
+        withCredentials: true,
+      });
       setUserDetails(response.data.data.userDetails);
+      if (redirectPage) {
+        navigate(redirectPage);
+      }
     } catch (err) {
       console.error("Error fetching user:", err);
       setUserDetails(null);
     } finally {
       setIsLoding(false);
     }
+  }, [redirectPage, navigate]);
+
+  useEffect(() => {
+    if (userDetails && Object.keys(userDetails)?.length === 0) {
+      fetchUser();
+    }
+    setIsLoding(false);
+  }, [userDetails, fetchUser]); // Now fetchUser is stable and included
+
+  // const getSession = useCallback(async () => {
+  //   try {
+  //     const response = await api.get(
+  //       `${base_url}?lat=${userLocation.lat}&lng=${userLocation.lng}`,
+  //       { withCredentials: true }
+  //     );
+
+  //     sessionStorage.setItem("tid", response.data.data.tid);
+  //     localStorage.setItem(
+  //       "indian_tadka_userLocation",
+  //       JSON.stringify({
+  //         lat: userLocation.lat,
+  //         lng: userLocation.lng,
+  //       })
+  //     );
+  //   } catch (err) {
+  //     console.error("Login failed:", err);
+  //   }
+  // }, [userLocation]);
+
+  const registerSession = async (lat, lng) => {
+    try {
+      const params = lat && lng ? { lat, lng } : {}; // Send only if available
+      const response = await api.get(
+        `${base_url}`,
+        {},
+        { params, withCredentials: true }
+      );
+      if (response.data.statusCode === 200) {
+        setIsLocationFetched(true);
+        sessionStorage.setItem("tid", response.data.data.tid);
+        if (userLocation?.lat && userLocation?.lng) {
+          localStorage.setItem(
+            "indian_tadka_userLocation",
+            JSON.stringify({
+              lat: userLocation.lat,
+              lng: userLocation.lng,
+            })
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Session registration failed:", error);
+    }
   };
 
   useEffect(() => {
-    fetchUser();
-  }, []);
+    if (redirectPage && userDetails) {
+      navigate(`${redirectPage}`);
+    }
+  }, [redirectPage,userDetails, navigate]);
 
   const login = async (email, password) => {
     try {
@@ -86,6 +243,7 @@ const StoreContextProvider = (props) => {
       );
       if (response.data.statusCode === 200) {
         fetchUser(); // Fetch user after successful login
+        handleLoginModal();
       }
     } catch (err) {
       console.error("Login failed:", err);
@@ -114,10 +272,13 @@ const StoreContextProvider = (props) => {
         withCredentials: true,
       });
       if (response.data.statusCode === 200) {
-        console.log("Successfully logged out");
-        setUserDetails(null); // Clear user state on frontend
-        localStorage.removeItem("access_token"); // Remove access token
-        localStorage.removeItem("refresh_token"); // Remove refresh token
+        setUserDetails(null);
+        setCartItems({})
+        setCartItemCount(0)
+        handleCart()
+        handleRedirectPage('/')
+        navigate('/');
+
       }
     } catch (err) {
       console.error("Error logging out:", err);
@@ -168,6 +329,15 @@ const StoreContextProvider = (props) => {
     handleOtpModal,
     isOtpModalOpen,
     resendOTP,
+    userLocation,
+    setUserLocation,
+    menu_list,
+    cartItemCount,
+    registerSession,
+    isuserLocationFetched,
+    isLoginModalOpen,
+    handleLoginModal,
+    handleRedirectPage,
   };
 
   return (

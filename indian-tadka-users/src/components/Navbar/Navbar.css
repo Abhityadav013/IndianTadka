@@ -42,7 +42,7 @@
   right: -8px;
 } */
 
-.navbar-search-icon .dot {
+/* .navbar-search-icon .dot {
   position: absolute;
   top: -4px;
   right: -4px;
@@ -51,7 +51,37 @@
   background-color: red;
   border-radius: 50%;
   border: 2px solid white;
+} */
+
+.navbar-search-icon .cart-count {
+  position: absolute;
+  top: -10px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at top left, #ff4d4d, #cc0000); /* 3D gradient */
+  border-radius: 50%;
+  border: 2px solid white;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.3), 0px 1px 2px rgba(255, 0, 0, 0.8); /* 3D shadow */
+  text-shadow: 0px 1px 2px rgba(0, 0, 0, 0.5);
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
 }
+
+.navbar-search-icon .cart-count:hover {
+  transform: scale(1.1); /* Slight pop effect */
+}
+
+.hidden {
+  display: none; /* Hide when count is zero */
+}
+
 
 .navbar button {
   background: transparent;

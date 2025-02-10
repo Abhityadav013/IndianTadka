@@ -1,7 +1,6 @@
 import React, { useContext, useState } from "react";
 import "./Cart.css";
 import { StoreContext } from "../../context/StoreContext";
-import { useNavigate } from "react-router-dom";
 import EmailVerificationAlert from "../../components/EmailVerification/EmailVerification";
 
 const Cart = () => {
@@ -11,9 +10,17 @@ const Cart = () => {
     removeFromCart,
     getTotalCartAmount,
     userDetails,
+    handleLoginModal,
+    handleRedirectPage,
   } = useContext(StoreContext);
+
+  const checkout = async () => {
+    if (!userDetails) {
+      handleLoginModal();
+    }
+    handleRedirectPage("/order");
+  };
   const [deliveryFee] = useState(2);
-  const navigate = useNavigate();
   return (
     <div className="cart">
       {userDetails && <EmailVerificationAlert user={userDetails} />}
@@ -33,8 +40,8 @@ const Cart = () => {
             return (
               <div key={index}>
                 <div className="cart-items-title cart-items-item">
-                  <img src={item.image} alt="" />
-                  <p>{item.name}</p>
+                  <img src={item.imageURL} alt="" />
+                  <p>{item.itemName}</p>
                   <p>{item.price}</p>
                   <p>{cartItems[item.id]}</p>
                   <p>{item.price * cartItems[item.id]}</p>
@@ -68,9 +75,7 @@ const Cart = () => {
               <b>{getTotalCartAmount(deliveryFee)}</b>
             </div>
           </div>
-          <button onClick={() => navigate("/order")}>
-            PROCEED TO CHECKOUT
-          </button>
+          <button onClick={() => checkout()}>PROCEED TO CHECKOUT</button>
         </div>
         <div className="cart-promocode">
           <div>

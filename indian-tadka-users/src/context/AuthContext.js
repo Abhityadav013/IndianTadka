@@ -28,35 +28,8 @@ export const AuthProvider = ({ children }) => {
         { email, password },
         { withCredentials: true }
       );
-      const cookies = document.cookie; // This will get the cookies stored in the document (client-side)
-
-    console.log('Cookies from document.cookie >>>>>>', cookies);
-
-      // The API response has no tokens in the body, so tokens are in the cookies
-      // Retrieve the access_token and refresh_token from the cookies
-      const accessToken = cookies
-        .split(";")
-        .find((cookie) => cookie.trim().startsWith("access_token="))
-        ?.split("=")[1];
-
-      const refreshToken = document.cookie
-        .split(";")
-        .find((cookie) => cookie.trim().startsWith("refresh_token="))
-        ?.split("=")[1];
-
-      console.log("accessToken>>>>>>", accessToken);
-
-      console.log("refreshToken>>>>>>", refreshToken);
-
-      // Check if the tokens are retrieved from the cookies
-      if (accessToken && refreshToken) {
-        // Optionally store tokens and user data in localStorage or state if needed
-        localStorage.setItem("user", JSON.stringify(response.data.user)); // Store user info in localStorage (for now)
-        setUser(response.data.user); // Update the user state in your app
-
-        console.log("Tokens from cookies:", { accessToken, refreshToken });
-      } else {
-        console.error("Tokens not found in cookies");
+      if (response.data.statusCode === 200) {
+        setUser(response.data.data.user);
       }
     } catch (err) {
       console.error("Login failed:", err);

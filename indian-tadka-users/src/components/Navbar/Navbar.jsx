@@ -14,22 +14,18 @@ const NavBar = () => {
     logoutUser,
     isLoading,
     isOtpModalOpen,
-    handleOtpModal
+    handleOtpModal,
+    cartItemCount,
+    isLoginModalOpen,
+    handleLoginModal,
+    handleRedirectPage
   } = useContext(StoreContext);
   const [menu, setMenu] = useState("home");
-  const [isModalOpen, setModalOpen] = useState(false);
 
-  const showModal = () => {
-    setModalOpen(true); // Show modal
-  };
-
-  const handleCancel = () => {
-    setModalOpen(false); // Hide modal
-  };
-
-  const handleOk = () => {
-    setModalOpen(false); // Hide modal on OK click
-  };
+  const handleCart = async()=>{
+    setMenu("cart")
+    handleRedirectPage('/cart')
+  }
 
   return (
     <div className="navbar">
@@ -77,24 +73,32 @@ const NavBar = () => {
           alt=""
         />
         <div className="navbar-search-icon">
-          <Link to="/cart" onClick={() => setMenu("cart")}>
+          <Link to="/cart" onClick={() => handleCart()}>
             {" "}
             <img
               src="https://testing.indiantadka.eu/assets/basket_icon.png"
               alt=""
             />
           </Link>
-          <div className={getTotalCartAmount() === 0 ? "" : "dot"} />
+          {cartItemCount > 0 && (
+            <div
+              className={`cart-count ${
+                getTotalCartAmount() === 0 ? "hiddsen" : ""
+              }`}
+            >
+              {cartItemCount}
+            </div>
+          )}
         </div>
         {!isLoading && // Only render after loading is complete
           (userDetails && userDetails.name ? (
             <UserProfileMenu userData={userDetails} logoutUser={logoutUser} />
           ) : (
-            <button onClick={showModal}>Sign In</button> // ✅ Show "Sign In" if no user
+            <button onClick={handleLoginModal}>Sign In</button> // ✅ Show "Sign In" if no user
           ))}
       </div>
-      <AuthForm visible={isModalOpen} onCancel={handleCancel} onOk={handleOk} />
-      { isOtpModalOpen  && (
+      <AuthForm visible={isLoginModalOpen} onCancel={handleLoginModal} onOk={handleLoginModal} />
+      {isOtpModalOpen && (
         <Modal size="small" onClose={handleOtpModal}>
           <OTPComponent />
         </Modal>
